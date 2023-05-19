@@ -1,0 +1,84 @@
+$(function() {
+
+                $('#app').popover({
+
+                    trigger: 'hover',
+
+                    html: true,
+
+                    content: "<img src='img/sao.png'><br><span>&nbsp&nbsp&nbsp扫码下载手机客户端</span>"
+
+                })
+
+            })
+const nextControl = new Super.NextControl()
+
+const Dbspeen = new Super.DbspeenControl()
+
+const BarrageControl = new Super.BarrageControl()
+
+const fullScreenControl = new Super.FullScreenControl()
+
+const video = new Super.Svideo('videoContainer', {
+
+    source: new Super.VideoSource({
+
+        src: './video/one.mp4'
+
+    }),
+
+    leftControls: [nextControl],
+
+    rightControls: [Dbspeen, fullScreenControl],
+
+    centerControls: [BarrageControl]//弹幕
+
+})
+
+nextControl.addEventListener('click', () => {
+
+    alert('click next menu !!!')
+
+})
+
+fullScreenControl.addEventListener('fullscreen', () => {
+
+    console.log('is fullscreen !!!')
+
+    $("#navigation").hide()
+
+    $("#text").hide()
+
+    $("#text2").hide()
+
+})
+
+fullScreenControl.addEventListener('cancelfullscreen', () => {
+
+    console.log('cancel fullscreen !!!')
+
+    $("#navigation").show()
+
+    $("#text").show()
+
+    $("#text2").show()
+
+})
+
+video.addEventListener('fullscreen', () => {
+
+    console.log('is fullscreen !!!')
+
+})
+
+video.addBarrage(new Super.Barrage('冲冲冲！！！', {
+
+    color: 'red',
+
+    fontSize:'30px',
+
+}))
+
+video.addBarrage('太强了趴~~~~~~')
+
+video.addBarrage('针不戳！！！！！！')
