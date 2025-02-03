@@ -2,171 +2,102 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>电子书阅读统计</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线代码执行器</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 自定义样式 -->
     <style>
         body {
-            max-width: 800px;
-            margin: 0 auto;
+            background-color: #f8f9fa;
             padding: 20px;
-            font-family: 'Segoe UI', sans-serif;
-            background: #f5f5f5;
         }
-        .dashboard {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-        .stat-box {
-            background: #f8f9fa;
+        .code-editor {
+            background-color: #2d2d2d;
+            color: #f8f9fa;
+            font-family: "Courier New", monospace;
             padding: 15px;
-            border-radius: 8px;
-            text-align: center;
+            border-radius: 5px;
+            min-height: 200px;
         }
-        .stat-value {
-            font-size: 24px;
-            color: #2c3e50;
-            font-weight: bold;
-            margin: 5px 0;
-        }
-        input[type="text"], input[type="number"] {
-            padding: 8px;
-            margin: 5px;
+        .output {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            min-height: 100px;
             border: 1px solid #ddd;
-            border-radius: 4px;
-            width: 200px;
         }
-        button {
-            background: #3498db;
+        .btn-run {
+            margin-top: 15px;
+            background-color: #28a745;
             color: white;
             border: none;
             padding: 10px 20px;
             border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
+            font-size: 16px;
         }
-        button:hover {
-            background: #2980b9;
+        .btn-run:hover {
+            background-color: #218838;
         }
-        #book-list {
-            margin-top: 20px;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }
-        .book-item {
-            padding: 10px;
-            background: #f8f9fa;
-            margin: 5px 0;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
+        .title {
+            color: #343a40;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="dashboard">
-        <h1>📖 我的电子书阅读统计</h1>
-        <div class="stats-grid">
-            <div class="stat-box">
-                <div>统计日期</div>
-                <div class="stat-value" id="current-date"></div>
-            </div>
-            <div class="stat-box">
-                <div>阅读总量</div>
-                <div class="stat-value" id="total-books">0 本</div>
-            </div>
-            <div class="stat-box">
-                <div>总页数</div>
-                <div class="stat-value" id="total-pages">0 页</div>
-            </div>
-            <div class="stat-box">
-                <div>节省金额</div>
-                <div class="stat-value" id="total-saving">¥0</div>
+    <div class="container">
+        <h1 class="title text-center">在线代码执行器</h1>
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <!-- 代码输入框 -->
+                <textarea id="code" class="form-control code-editor" placeholder="输入你的代码..."></textarea>
+                <!-- 执行按钮 -->
+                <button id="run-btn" class="btn btn-run w-100" onclick="runCode()">
+                    执行代码
+                </button>
+                <!-- 输出结果 -->
+                <div class="output">
+                    <h5>输出结果：</h5>
+                    <pre id="output" class="mt-2"></pre>
+                </div>
             </div>
         </div>
-
-        <h2>添加新书</h2>
-        <div>
-            <input type="text" id="book-title" placeholder="书名">
-            <input type="number" id="page-count" placeholder="页数" min="1">
-            <input type="number" id="book-price" placeholder="预估实体书价格" min="0" step="0.01">
-            <button onclick="addBook()">添加记录</button>
-        </div>
-
-        <h2>阅读记录</h2>
-        <div id="book-list"></div>
     </div>
 
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 自定义脚本 -->
     <script>
-        // 初始化本地存储
-        let readingData = JSON.parse(localStorage.getItem('readingData')) || {
-            books: [],
-            totalPages: 0,
-            totalSaving: 0
-        };
+        async function runCode() {
+            const code = document.getElementById("code").value;
+            const outputElement = document.getElementById("output");
+            const runBtn = document.getElementById("run-btn");
 
-        // 初始化显示
-        function updateDisplay() {
-            // 当前日期
-            document.getElementById('current-date').textContent = 
-                new Date().toLocaleDateString('zh-CN', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
+            // 禁用按钮并显示加载状态
+            runBtn.disabled = true;
+            runBtn.textContent = "执行中...";
+
+            try {
+                // 模拟后端 API 调用
+                const response = await fetch("https://your-backend-api.com/execute", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ code: code }),
                 });
-
-            // 统计数据
-            document.getElementById('total-books').textContent = 
-                `${readingData.books.length} 本`;
-            document.getElementById('total-pages').textContent = 
-                `${readingData.totalPages} 页`;
-            document.getElementById('total-saving').textContent = 
-                `¥${readingData.totalSaving.toFixed(2)}`;
-
-            // 书籍列表
-            const bookList = document.getElementById('book-list');
-            bookList.innerHTML = readingData.books.map(book => `
-                <div class="book-item">
-                    <span>《${book.title}》</span>
-                    <span>${book.pages}页</span>
-                    <span>¥${book.price.toFixed(2)}</span>
-                </div>
-            `).join('');
-        }
-
-        // 添加书籍
-        function addBook() {
-            const title = document.getElementById('book-title').value;
-            const pages = parseInt(document.getElementById('page-count').value);
-            const price = parseFloat(document.getElementById('book-price').value);
-
-            if (!title || isNaN(pages) || isNaN(price)) {
-                alert('请填写完整信息');
-                return;
+                const data = await response.json();
+                outputElement.textContent = data.output || data.error;
+            } catch (error) {
+                outputElement.textContent = "错误: " + error.message;
+            } finally {
+                // 恢复按钮状态
+                runBtn.disabled = false;
+                runBtn.textContent = "执行代码";
             }
-
-            readingData.books.push({ title, pages, price });
-            readingData.totalPages += pages;
-            readingData.totalSaving += price;
-
-            localStorage.setItem('readingData', JSON.stringify(readingData));
-            updateDisplay();
-            
-            // 清空输入框
-            document.getElementById('book-title').value = '';
-            document.getElementById('page-count').value = '';
-            document.getElementById('book-price').value = '';
         }
-
-        // 初始化时更新显示
-        updateDisplay();
     </script>
 </body>
 </html>
